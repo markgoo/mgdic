@@ -9,13 +9,20 @@
 
 ## 快速开始
 
-### 1. 下载数据（仓库里不带数据）
+### 1. 自己下载词典数据
 
-仓库只有源码。词典数据要从 [ECDICT](https://github.com/skywind3000/ECDICT)（MIT 许可）下载：
+**本项目不随仓库分发任何词典数据**——版权不在我这里，仓库里也不该出现几十上百 MB 的数据文件。
+词典数据请从 **[ECDICT](https://github.com/skywind3000/ECDICT)** 官方下载（MIT 许可，版权归其作者）：
 
 ```powershell
 curl.exe -sSL -o ecdict.csv https://raw.githubusercontent.com/skywind3000/ECDICT/master/ecdict.csv
 ```
+
+也可以去 [ECDICT Releases](https://github.com/skywind3000/ECDICT/releases) 挑别的格式
+（`ecdict-sqlite-28.zip` / `ecdict-stardict-28.zip` / `ecdict-mdx-28.zip`，给 GoldenDict 之类用的）。
+
+> 建出来的 `mgdic.db`（168MB）同样不要提交，`.gitignore` 里已经排除了
+> `ecdict.csv` / `*.db` / `bin/` / `.vendor/`。
 
 ### 2. 编译
 
@@ -103,11 +110,17 @@ curl.exe -sSL -o ecdict.csv https://raw.githubusercontent.com/skywind3000/ECDICT
 
 ## 数据
 
-**[ECDICT](https://github.com/skywind3000/ECDICT)**（MIT 许可）—— 76 万词条的英汉双解词典：
-音标、中文释义、英文释义、词性、考纲标签（中考/高考/CET4-6/考研/GRE）、柯林斯星级、
-牛津 3000 标记、传统与现代语料词频、**词形变化**。
+**本项目不打包、不分发词典数据。** 仓库只包含程序源码；数据由使用者自行从上游获取，
+版权与许可归上游作者。程序本身只负责把 CSV 转成 SQLite 索引，不改变、不再分发原始数据。
 
-建库后的 SQLite 结构：
+| | |
+|---|---|
+| 数据来源 | [ECDICT](https://github.com/skywind3000/ECDICT) |
+| 许可 | MIT（版权归 ECDICT 作者） |
+| 下载 | `https://raw.githubusercontent.com/skywind3000/ECDICT/master/ecdict.csv`（66MB） |
+| 内容 | 76 万词条：音标、中文释义、英文释义、词性、考纲标签（中考/高考/CET4-6/考研/GRE）、柯林斯星级、牛津 3000、传统与现代语料词频、词形变化 |
+
+建库后的 SQLite 结构（**这个库是本地派生产物，也不进仓库**）：
 
 ```sql
 entries(id, word, key_norm, phonetic, definition, translation, pos, tag, exchange, freq, oxford, collins)
