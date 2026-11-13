@@ -1,0 +1,18 @@
+# 构建产物
+bin/
+*.exe
+*.exe~
+
+# 词典数据：从 ECDICT 下载，或由 CSV 建出来
+.vendor/
+ecdict.csv
+*.db
+*.db.tmp
+
+# 本机配置与日志（config.json 里有 api_key）
+config.json
+startup.log
+
+# 编辑器
+.vscode/
+.idea/
