@@ -133,12 +133,23 @@ func openDB(cfg *config.Config) (*store.DB, error) {
 			fmt.Printf("词典库建好了：%d 条词条 / %.0f MB\n",
 				st.Rows, float64(st.SizeBytes)/(1<<20))
 		} else {
-			return nil, fmt.Errorf("还没有词典库（%s），也没找到源 CSV。\n\n"+
-				"两种办法：\n"+
-				"  1) 下载 ecdict.csv 放到本程序旁边，然后重新启动（会自动建库）\n"+
-				"     curl.exe -sSL -o ecdict.csv https://raw.githubusercontent.com/skywind3000/ECDICT/master/ecdict.csv\n"+
-				"  2) 从别处拷一份 mgdic.db 放到本程序旁边\n\n"+
-				"源 CSV 应该在：%s", cfg.DictDB, cfg.DictCSV)
+			// 既没有库也没有 CSV：自己去上游下载，别让用户对着报错发呆
+			fmt.Printf("首次运行：本地没有词典数据，正在从 ECDICT 下载…\n  来源: %s\n", ecdictURL)
+			if dlErr := downloadFile(ecdictURL, cfg.DictCSV); dlErr != nil {
+				return nil, fmt.Errorf("下载词典数据失败: %w\n\n"+
+					"可以手动下载后放到本程序旁边再启动：\n"+
+					"  curl.exe -sSL -o ecdict.csv %s\n"+
+					"应该放到的位置：%s", dlErr, ecdictURL, cfg.DictCSV)
+			}
+			fmt.Printf("首次运行：正在建立词典库（约 10 秒，只需一次）…\n")
+			st, impErr := store.Import(cfg.DictCSV, cfg.DictDB, func(f string, a ...any) {
+				fmt.Printf(f+"\n", a...)
+			})
+			if impErr != nil {
+				return nil, fmt.Errorf("自动建库失败: %w", impErr)
+			}
+			fmt.Printf("词典库建好了：%d 条词条 / %.0f MB\n",
+				st.Rows, float64(st.SizeBytes)/(1<<20))
 		}
 	}
 	db, err := store.Open(cfg.DictDB)
