@@ -86,8 +86,10 @@ exe 11MB、常驻内存 20MB、启动 0.2 秒。
 | 下载 | `https://raw.githubusercontent.com/skywind3000/ECDICT/master/ecdict.csv`（66MB） |
 | 内容 | 76 万词条：音标、中英释义、词性、考纲标签（中考/高考/CET4-6/考研/GRE）、柯林斯星级、牛津 3000、语料词频、词形变化 |
 
-把 `ecdict.csv` 放在 exe 旁边，程序启动时会自动建库。
-也可以在 [ECDICT Releases](https://github.com/skywind3000/ECDICT/releases) 挑别的格式给 GoldenDict 之类用。
+把 `ecdict.csv` 放在 exe 旁边，程序启动时会自动建库（也可以让程序自己下载，见「安装」）。
+
+> mgdic 只认 CSV 这一种格式。ECDICT 还提供 Stardict / MDX 等格式，那是给别的词典软件用的，
+> mgdic 不读。
 
 ## 从源码构建
 
