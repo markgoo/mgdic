@@ -65,3 +65,5 @@
   于是每条线程都被误判成"没有桌面"
 - **同一段文字没被重绘**：换成"自绘框 + RichEdit 文本框"后，文本框自己会更新，但自绘部分需要
   `InvalidateRect` 才会重画——漏了就会看到框里还是上一个词的内容
+- **`FindWindowW(类名)` 在这台机器上找不到自己注册的窗口**（返回 0），而 `EnumWindows` 能枚举到
+  同一个 hwnd。做自动化时别用 `FindWindowW` 定位弹窗，用 `EnumWindows` + `GetClassNameW` 按类名筛

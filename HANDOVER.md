@@ -19,12 +19,13 @@ Windows 本地词典：`Alt+E` 呼出小窗 → 查词/词组/句子 → 复制�
 - 回车翻译整句 → `[DeepSeek] 我非常喜欢游泳`
 - 首次运行无库无 CSV → 自动下载 66MB → 建库 168MB → 能查
 - 托盘菜单、开机自启勾选状态、版本号显示
+- **点圆角框复制**（2026-11-13 实测）：先往剪贴板放哨兵 `SENTINEL-BEFORE-CLICK`，
+  发 `WM_LBUTTONUP` 点 `apple` 的卡片，`Get-Clipboard` 读回
+  `n. 苹果, 家伙\r\n[医] 苹果`，`startup.log` 同步出现 `已复制：...`。
+  上一台机器剪贴板整体坏掉（`OpenClipboard` 返回 `Access is denied`）是那台机器的问题，不是代码问题。
 
 **未验证 —— 需要真人确认**：
 
-- **剪贴板写入**。当时那台机器的剪贴板整个坏了（PowerShell 自己调 `OpenClipboard` 也返回
-  `Access is denied`，`Set-Clipboard` 报成功但读回空）。代码是标准写法 + 10 次重试，但**没跑通过一次**。
-  接手后第一件事应该是让用户点一下圆角框，确认能复制出来。
 - **真实用户的键盘手感**（输入法、长句、快速连打）。自动化只能发 `WM_CHAR`，测不到 IME。
 
 ## 环境事实
@@ -73,8 +74,8 @@ internal/version/ 版本号（发版只改这里）
 这个程序是 GUI，但你**可以完全不看屏幕地验证它**。做法是给窗口发消息：
 
 ```powershell
-# 找到窗口
-[Win32]::FindWindowW("mgdic.Popup", $null)
+# 找到窗口：这台机器上 FindWindowW("mgdic.Popup") 会返回 0（原因未查明），
+# 用 EnumWindows + GetClassNameW 按类名找才靠得住
 # 显示/收起（等价于按 Alt+E）
 SendMessage($hwnd, 0x0312, 1, 0)              # WM_HOTKEY
 # 往输入框打字
@@ -115,7 +116,7 @@ SendMessage($hwnd, 0x0202, 0, ($y -shl 16) -bor $x)  # WM_LBUTTONUP
 
 按价值排序：
 
-1. **确认剪贴板**（见上面「未验证」）。这是唯一可能"功能不成立"的风险点。
+1. ~~确认剪贴板~~ —— 已验证通过，见上面「已端到端验证」。
 2. **中文方向的候选质量**。倒排索引有固有噪音：`喜欢 → care for`（ECDICT 的 `like` 词条里没有
    "喜欢"这个释义）、`美丽 → pulchritude`（`beautiful` 写的是"美丽的"）。
    `query.zhCandidateScore` 是调权重的入口，改完用 `mgdic-cli.exe q <词>` 批量对比。
